@@ -27,41 +27,59 @@ router.get("/:company", (req, res, next) => {
   const dbRef = realtime.ref(realtime.getDatabase());
 
   //Database get
-  realtime.get(realtime.child(dbRef, `${company.toLowerCase()}`)).then((snapshot) => {
-    //Check if that company exists in the db
-    if (snapshot.exists()) {
-      //Const 1k miles price
-      const price = snapshot.val().pre / snapshot.val().quantity 
-      
-      //Response Data
-      res.status(200).send({
-        "company": company,
-        "quantity": snapshot.val().quantity,
-        "prices": {
-          "pre": snapshot.val().pre,
-          "pos": snapshot.val().pos,
-          "1k": price
-        }
-      });  
-    } else {
-      //Response Not Found
-      res.status(404).send({
-        company: undefined
-      });    
-    } 
-  }).catch((error) => { //Catch Error
-    //Response Error
-    res.status(500).send({
-      error: error,
+  realtime
+    .get(realtime.child(dbRef, `${company.toLowerCase()}`))
+    .then((snapshot) => {
+      //Check if that company exists in the db
+      if (snapshot.exists()) {
+        //Response Data
+        res.status(200).send(snapshot.val());
+      } else {
+        //Response Not Found
+        res.status(404).send({
+          company: undefined,
+        });
+      }
+    })
+    .catch((error) => {
+      //Catch Error
+      //Response Error
+      res.status(500).send({
+        error: error,
+      });
     });
-  });  
 });
 
 //Response Index
 router.get("/", (req, res, next) => {
-  res.status(200).send({
-    company: undefined,
-  });
+  //Url company name
+  const company = "all";
+
+  //Database reference
+  const dbRef = realtime.ref(realtime.getDatabase());
+
+  //Database get
+  realtime
+    .get(realtime.child(dbRef, `${company.toLowerCase()}`))
+    .then((snapshot) => {
+      //Check if that company exists in the db
+      if (snapshot.exists()) {
+        //Response Data
+        res.status(200).send(snapshot.val());
+      } else {
+        //Response Not Found
+        res.status(404).send({
+          company: undefined,
+        });
+      }
+    })
+    .catch((error) => {
+      //Catch Error
+      //Response Error
+      res.status(500).send({
+        error: error,
+      });
+    });
 });
 
 module.exports = router;
